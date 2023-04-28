@@ -16,7 +16,7 @@ export async function getTweets(req, res) {
 export async function getTweetsById(req, res, next){
     // router.get('/:id', (req, res, next) => {
     const id = req.params.id;
-    const tweet = tweets.find((tweet) => tweet.id === id);
+    const tweet = tweetRepository.getTweetsById(id)
         if  (tweet) {
             res.status(200).json(tweet);
         }else{
