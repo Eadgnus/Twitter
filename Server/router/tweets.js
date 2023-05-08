@@ -35,6 +35,7 @@ router.post('/', isAuth, validateTweet, tweetController.postTweets);
 
 // PUT
 // text만 수정
+// 해당 아이디를 보내고 isAuth로 토큰 인증 함
 router.put('/:id', isAuth, validateTweet, tweetController.putTweets);
 
 // DELETE

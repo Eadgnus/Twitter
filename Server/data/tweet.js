@@ -1,53 +1,68 @@
 import express from 'express';
+import * as userRepository from './auth.js';
 
 let tweets = [
     {
         id: '1',
         text: '첫 트윗입니다!!',
         createdAT: Date.now().toString(),
-        name: 'apple',
-        username: "김사과",
-        url: '',
+        userId: '1'
     },
     {
         id: '2',
         text: '안녕하세요요!!',
         createdAT: Date.now().toString(),
-        name: 'banana',
-        username: '반하나',
-        url: '',
+        userId: '1'
+    },
+    {
+        id: '3',
+        text: '싱싱한 메론!!',
+        createdAT: Date.now().toString(),
+        userId: '1'
     }
 ];
 
 
 export async function getAll() {
-    return tweets;
+    return Promise.all(
+        tweets.map(async (tweet) => {
+            const { username, name, url } = await userRepository.findById(tweet.userId);
+            return { ...tweet, username, name, url };
+        })
+    )
 }
 
-export async function getAllbyUsername(username){
-    return tweets.filter((tweet) => tweet.username === username);
+export async function getAllbyUsername(username) {
+    return getAll()
+        .then((tweets => tweets.filter((tweet) => tweet.username === username)));
 }
 
 
-export async function getTweetsById(id){
-    return tweets.find((tweet) => tweet.id === id);
+export async function getTweetsById(id) {
+    const found = tweets.find((tweet) => tweet.id === id);
+    if (!found) {
+        return null;
+    }
+    const { username, name, url } = await userRepository.findById(found.userId)
+    return { ...found, username, name, url };
 }
 
-export async function create(text, name, username){
+
+
+export async function create(text, userId) {
     const tweet = {
         id: Date.now().toString(),
         text,
         createdAT: new Date(),
-        name,
-        username
+        userId
     };
     tweets = [tweet, ...tweets];
-    return tweets
+    return getTweetsById(tweet.id)
 }
 
 export async function update(id, text) {
     const tweet = tweets.find((tweet) => tweet.id === id);
-    if(tweet){
+    if (tweet) {
         tweet.text = text;
     }
     return tweet
