@@ -1,4 +1,6 @@
+import { getSocketIO } from '../connection/socket.js';
 import * as tweetRepository from '../data/tweet.js';
+// import { chat } from './socket.js'
 
 //get
 export async function getTweets(req, res) {
@@ -30,9 +32,9 @@ export async function postTweets(req, res, next) {
     // router.post('/', (req, res, next) => {
     const { text } = req.body;
     const tweet = await tweetRepository.create(text, req.userId);
+    getSocketIO().emit('tweets', tweet);
     res.status(201).json(tweet);
 }
-
 // // PUT
 // // text만 수정
 // export async function putTweets(req, res, next){
@@ -60,7 +62,7 @@ export async function postTweets(req, res, next) {
 export async function putTweets(req, res, next) {
     const id = req.params.id;
     const text = req.body.text;
-    const tweet = await tweetRepository.getTweetsByIdById(id);
+    const tweet = await tweetRepository.getTweetsById(id);
 
     if (!tweet) {
         return res.status(404).json({ message: `tweet id(${id}) is not found` });
@@ -77,7 +79,7 @@ export async function putTweets(req, res, next) {
 // DELETE
 export async function deleteTweets(req, res, next) {
     const id = req.params.id;
-    const tweet = await tweetRepository.getTweetsByIdById(id); // 객체를 알아냄
+    const tweet = await tweetRepository.getTweetsById(id); // 객체를 알아냄
 
     if (!tweet) {
         return res.status(404).json({ message: `tweet id(${id}) is not found` });
