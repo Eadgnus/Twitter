@@ -1,6 +1,6 @@
 import express from 'express';
 import * as userRepository from './auth.js';
-import { db } from '../db/database.js'
+// import { db } from '../db/database.js'
 
 let tweets = [
     {
@@ -43,27 +43,20 @@ export async function getAll() {
 export async function getAllbyUsername(username) {
     // return getAll()
     //     .then((tweets => tweets.filter((tweet) => tweet.username === username)));
-    return db.execute(`${SELECT_JOIN} where users.username = ? ${ORDER_DESC}  `, [username]).then((result) => result[0]);
+    return db.execute(`${SELECT_JOIN} where users.username = ? ${ORDER_DESC} ; `, [username]).then((result) => result[0]);
 }
 
 
 export async function getTweetsById(id) {
-    // const found = tweets.find((tweet) => tweet.id === id);
-    // if (!found) {
-    //     return null;
-    // }
-    // const { username, name, url } = await userRepository.findById(found.userId)
-    // return { ...found, username, name, url };
-    console.log(id)
-    const a = `${SELECT_JOIN} where tweets.id = ? ${ORDER_DESC}`;
-    console.log(a)
-    // return db.execute(`${SELECT_JOIN} where tweets.id = ${id}`).then((result) => result[0]);
-    return db.execute(`${SELECT_JOIN} where tweets.id = ?`, [id]).then((result) => result[0]);
+    return db.execute(`${SELECT_JOIN} where tweets.id = ?; `, [id]).then((result) => result[0][0]).then((error) => {
+        return console.log(error);
+    });
+    // return db.execute('SELECT users.id, users.username, users.password, users.name, users.email, users.url, tweets.text, tweets.createAT, tweets.userid FROM users left outer JOIN tweets on users.id = tweets.userid where tweets.id = ?', [id]).then((result) => result[0][0]);
 }
 
 
 
-export async function create(userId, text) {
+export async function create(text, userId) {
     // const tweet = {
     //     id: Date.now().toString(),
     //     text,
